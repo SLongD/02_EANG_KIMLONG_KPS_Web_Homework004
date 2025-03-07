@@ -2,7 +2,6 @@ import { EllipsisVertical } from "lucide-react";
 import React from "react";
 import { useState } from "react";
 export default function CardComponent({ projectTask = []}){
-  //const [progress, setProgress] = useState(projectTask.progress);
   return (
     <div className="grid grid-cols-2 justify-center items-center gap-10 h-[380px]">
         {projectTask?.map(({id, projectName, dueDate, progress, projectDescription }) => (
