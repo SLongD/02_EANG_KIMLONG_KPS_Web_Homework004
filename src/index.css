@@ -19,3 +19,6 @@
   /* config custom font */
   --font-rubik: "Rubik", "sans-serif";
 }
+::-webkit-scrollbar {
+  display: none;
+}

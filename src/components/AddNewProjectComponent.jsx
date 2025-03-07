@@ -1,7 +1,60 @@
 import { Plus } from "lucide-react";
 import React from "react";
+import { useState } from "react";
 
-export default function AddNewProjectComponent() {
+export default function AddNewProjectComponent({ handleSubmitTask }) {
+  
+  const [task, setTask] = useState({});
+  const [errors, setErrors] = useState({});
+  // handle on form submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const validationErrors = validateInputs(task);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    const updatedTask = {
+      ...task,
+      projectDescription: task.projectDescription || "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestias similique quas incidunt fugit distinctio repudiandae sit mollitia ipsam eos dignissimos facere maxime, beatae atque hic? Eligendi ipsa possimus voluptatem error!",
+    
+    };
+    handleSubmitTask(updatedTask);
+    // handleSubmitTask(task);
+    document.querySelector("#crud-modal").classList.add("hidden", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full", "top-0", "left-0", "right-0");
+    document.querySelector("#crud-modal").classList.remove("flex", "items-center", "gap-3", "inset-0", "h-full");
+    setErrors({});
+    setTask({});
+  };
+
+  const handleUserInput = (e) => {
+    const {name, value} = e.target;
+    // setTask({...task, [e.target.name]: value });
+    setTask({...task, [name]: value });
+    setErrors({ ...errors, [name]: "" });
+  };
+
+  const validateInputs = (task) => {
+    const errors = {};
+
+    if (!task.projectName?.trim()) {
+      errors.projectName = "Project Name is required";
+    }
+
+    if (!task.dueDate) {
+      errors.dueDate = "Due Date is required";
+    } else if (new Date(task.dueDate) < new Date()) {
+      errors.dueDate = "Due Date must be in the future";
+    }
+    if (!task.progress) {
+      errors.progress = "Progress is required";
+    }
+
+    return errors;
+  };
+
   return (
     <div>
       <button
@@ -9,6 +62,10 @@ export default function AddNewProjectComponent() {
         data-modal-toggle="crud-modal"
         className=" text-white bg-custom-sky-blue hover:bg-custom-sky-blue-500 focus:ring-3 focus:outline-none focus:ring-custom-sky-blue-500  font-medium rounded-lg text-sm px-3 py-2.5 text-center dark:bg-custom-sky-blue-500 dark:hover:bg-custom-sky-blue-500  dark:focus:ring-custom-sky-blue-500  flex items-center gap-2"
         type="button"
+        onClick={()=>{
+          document.querySelector("#crud-modal").classList.remove("hidden", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full", "top-0", "left-0", "right-0");
+          document.querySelector("#crud-modal").classList.add("flex", "items-center", "gap-3", "inset-0", "h-full");
+        }}
       >
         <Plus size={22} /> <span className="text-base">New Project</span>
       </button>
@@ -27,6 +84,10 @@ export default function AddNewProjectComponent() {
               </h3>
               <button
                 type="button"
+                onClick={() =>{
+                  document.querySelector("#crud-modal").classList.add("hidden", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full", "top-0", "left-0", "right-0");
+                  document.querySelector("#crud-modal").classList.remove("flex", "items-center", "gap-3", "inset-0", "h-full");
+                }}
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 data-modal-toggle="crud-modal"
               >
@@ -48,7 +109,7 @@ export default function AddNewProjectComponent() {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            <form className="p-4 md:p-5">
+            <form className="p-4 md:p-5" onSubmit={handleSubmit}>
               <div className="grid gap-4 mb-4 grid-cols-2">
                 <div className="col-span-2">
                   <label
@@ -60,11 +121,13 @@ export default function AddNewProjectComponent() {
                   <input
                     type="text"
                     name="projectName"
+                    onChange={handleUserInput}
                     id="projectName"
+                    value={task.projectName || ""}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Type Project Name"
-                    required
                   />
+                  {errors.projectName && <p className="text-red-500 text-sm mt-1">{errors.projectName}</p>}
                 </div>
 
                 <div className="col-span-2">
@@ -75,12 +138,14 @@ export default function AddNewProjectComponent() {
                     Due Date
                   </label>
                   <input
+                    onChange={handleUserInput}
                     type="date"
                     name="dueDate"
                     id="dueDate"
+                    value={task.dueDate || ""}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required
                   />
+                  {errors.dueDate && <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>}
                 </div>
 
                 <div className="col-span-2">
@@ -91,15 +156,19 @@ export default function AddNewProjectComponent() {
                     Progress
                   </label>
                   <select
+                    onChange={handleUserInput}
                     id="progress"
+                    name="progress"
+                    value={task.progress || ""}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   >
                     <option defaultValue="">Select Progress</option>
-                    <option value="100">100</option>
-                    <option value="75">75</option>
-                    <option value="50">50</option>
-                    <option value="25">25</option>
+                    <option value="100" >100</option>
+                    <option value="75" >75</option>
+                    <option value="50" >50</option>
+                    <option value="25" >25</option>
                   </select>
+                  {errors.progress && <p className="text-red-500 text-sm mt-1">{errors.progress}</p>}
                 </div>
                 <div className="col-span-2">
                   <label
@@ -110,6 +179,9 @@ export default function AddNewProjectComponent() {
                   </label>
                   <textarea
                     id="description"
+                    name="projectDescription"
+                    value={task.projectDescription|| ""}
+                    onChange={handleUserInput}
                     rows="4"
                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Write product description here"
@@ -117,7 +189,7 @@ export default function AddNewProjectComponent() {
                 </div>
               </div>
               <div className="text-right">
-                <button
+                <button 
                   type="submit"
                   className="text-white inline-flex items-center bg-custom-sky-blue hover:bg-custom-sky-blue-500 focus:ring-4 focus:outline-none focus:ring-custom-sky-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-custom-sky-blue-500 dark:hover:bg-custom-sky-blue-500 dark:focus:ring-custom-sky-blue-500"
                 >

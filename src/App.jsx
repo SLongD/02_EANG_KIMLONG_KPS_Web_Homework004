@@ -1,37 +1,68 @@
 import "./App.css";
-import AssignmentsComponent from "./components/AssignmentsComponent";
-import DashboardComponent from "./components/DashboardComponent";
-import LearningMaterialsComponent from "./components/LearningMaterialsComponent";
+import { useState } from "react";
 import SidebarComponent from "./components/SidebarComponent";
 import TopNavbarComponent from "./components/TopNavbarComponent";
+import DashboardComponent from "./components/DashboardComponent";
+import AssignmentsComponent from "./components/AssignmentsComponent";
+import LearningMaterialsComponent from "./components/LearningMaterialsComponent";
+import AddNewProjectComponent from "./components/AddNewProjectComponent";
+import CardComponent from "./components/CardComponent";
+
 
 function App() {
+  const [projectTask, setProjectTask] = useState([
+    
+  ]);
+  const [filteredTasks, setFilteredTasks] = useState(projectTask);
+  const handleSubmitTask = (task) => {
+    const newTask = { ...task, id: Date.now() }; // Add a unique ID to the new task
+    const updatedTasks = [...projectTask, newTask];
+    setProjectTask(updatedTasks); // Update the main task list
+    setFilteredTasks(updatedTasks); // Update the filtered task list to include the new task
+  };
+  
+
+  const handleSearch = (search) => {
+    const filtered = projectTask.filter((task) =>
+      task.projectName.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredTasks(filtered);
+  };
+  
+  
   return (
-    <>
-      <div className="font-rubik text-primary-text bg-light-gray flex h-screen overflow-hidden">
-        {/* sidebar */}
-        <div className="w-1/5">
-          <SidebarComponent />
+    <section className="flex flex-row gap-x-10 bg-light-gray">
+      {/* sidebar */}
+      <div className="w-[290px] bg-custom-sky-blue dark:bg-custom-sky-blue-dark">
+        <SidebarComponent/>
+      </div>
+      
+      <div className="bg-light-gray mt-5">
+        <div className="w-auto ">
+          <TopNavbarComponent projectTask={projectTask} onSearch={handleSearch}/>
         </div>
-
-        {/* top navigation bar */}
-        <div className="w-4/5 p-12">
-          <TopNavbarComponent />
-
-          {/* dashboard summary */}
-          <div className="flex justify-between">
-            <div className="w-9/12 mt-5 space-y-5">
-              <DashboardComponent />
-              <AssignmentsComponent />
+        
+        <div className="flex gap-6 mt-10">
+          <div className="w-[840px] bg-light-gray dark:bg-gray-800 flex flex-col gap-y-7">
+          <h2 className="text-xl font-semibold mb-5 sticky">Dashboard</h2>
+            <div className="flex flex-row justify-between overflow-x-auto">
+              <DashboardComponent/>
             </div>
-
-            <div className="w-3/12 pl-10 mt-5">
-              <LearningMaterialsComponent />
+            <div className="flex flex-row justify-between mt-5">
+              <AssignmentsComponent/>
+              <AddNewProjectComponent handleSubmitTask={handleSubmitTask}/>
             </div>
+            <div className="overflow-auto h-[380px] flex justify-center items-center"> 
+              <CardComponent projectTask={filteredTasks}/> 
+            </div>
+            
+          </div>
+          <div className="w-[300px]">
+            <LearningMaterialsComponent/>   
           </div>
         </div>
       </div>
-    </>
+    </section>
   );
 }
 
